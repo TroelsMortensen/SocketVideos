@@ -38,6 +38,7 @@ public class ChatServerHandler implements Runnable {
                 System.out.println(message);
                 if(body.equalsIgnoreCase("exit")) {
                     pool.removeConnection(this);
+                    out.writeObject(message);
                     socket.close();
                     break;
                 }

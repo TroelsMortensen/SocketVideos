@@ -11,15 +11,15 @@ import java.util.Scanner;
 public class ChatClient {
 
     private ObjectInputStream in;
+    private Socket socket;
 
     public void startClient() {
         try {
-            Socket socket = new Socket("localhost", 2910);
+            socket = new Socket("localhost", 2910);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
             Thread thread = new Thread(this::listenToServer);
-            thread.setDaemon(true);
             thread.start();
 
             Scanner scanner = new Scanner(System.in);
@@ -35,7 +35,6 @@ public class ChatClient {
                 out.writeObject(m);
 
                 if(msg.equalsIgnoreCase("exit")){
-                    socket.close();
                     break;
                 }
             }
@@ -48,6 +47,10 @@ public class ChatClient {
         try {
             while (true) {
                 Message response = (Message) in.readObject();
+                if(response.getMessageBody().equalsIgnoreCase("exit")){
+                    socket.close();
+                    break;
+                }
                 System.out.println(response);
             }
         } catch (IOException | ClassNotFoundException e) {
